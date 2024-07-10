@@ -33,7 +33,7 @@ def transaction(request, recv_address):
             reciever_obj = MintUser.objects.get(address = reciever_address)
             if reciever_obj == sender_obj:
                 messages.error(request, "sender is same as reciever")
-            elif sender_obj.get_balance() < amount:
+            elif sender_obj.get_balance() - (Transaction.objects.filter(confirmed = False, sender = request.user).aggregate(total = Sum("amount")).get("total") or 0) < amount:
                 messages.error(request, "Low Balance!")
             else:
                 Transaction.objects.create(
@@ -143,8 +143,8 @@ def get_blockchain(request):
                 "hash":transaction.hash,
                 "amount":transaction.amount,
                 "timestamp":transaction.timestamp,
-                "sender":transaction.sender.address,
-                "reciever":transaction.reciever.address
+                "sender":transaction.sender.username,
+                "reciever":transaction.reciever.username
             })
         json_data["blockchain"].append(block_dict)
 

@@ -19,6 +19,7 @@ class MintUser(AbstractUser):
         total_sent = Transaction.objects.filter(sender=self, confirmed=True).aggregate(total=Sum('amount'))['total'] or 0
         balance = total_received - total_sent
         return balance
+    
 
     def get_private_key(self):
         return rsa.PrivateKey.load_pkcs1(self.private_key)
