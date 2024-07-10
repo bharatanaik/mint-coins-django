@@ -1,29 +1,30 @@
 import hashlib
 import json, rsa
+import random
 from django.db import models
 from django.contrib.auth.models import AbstractUser
 from django.conf import settings
 from core.utils import sign
+from django.db.models import Sum
 
-class LillyUser(AbstractUser):
+
+class MintUser(AbstractUser):
     public_key = models.TextField(unique=True)
     private_key = models.TextField(unique=True)
-    amount = models.IntegerField(default=0)
     address = models.CharField(max_length=32, unique=True)
+
+
+    def get_balance(self):
+        total_received = Transaction.objects.filter(reciever=self, confirmed=True).aggregate(total=Sum('amount'))['total'] or 0
+        total_sent = Transaction.objects.filter(sender=self, confirmed=True).aggregate(total=Sum('amount'))['total'] or 0
+        balance = total_received - total_sent
+        return balance
 
     def get_private_key(self):
         return rsa.PrivateKey.load_pkcs1(self.private_key)
 
     def get_public_key(self):
         return rsa.PublicKey.load_pkcs1(self.public_key)
-
-    def send_amount(self, amount):
-        self.amount -= amount
-        self.save()
-
-    def recieve_amount(self,amount):
-        self.amount += amount
-        self.save()
 
     def save(self, *args, **kwargs) -> None:
         if len(self.address) != 32:
@@ -35,8 +36,8 @@ class LillyUser(AbstractUser):
 
     
 class Transaction(models.Model):
-    sender = models.ForeignKey(LillyUser, on_delete=models.CASCADE, related_name="sender")
-    reciever =  models.ForeignKey(LillyUser, on_delete=models.CASCADE, related_name="reciever")
+    sender = models.ForeignKey(MintUser, on_delete=models.CASCADE, related_name="sender")
+    reciever =  models.ForeignKey(MintUser, on_delete=models.CASCADE, related_name="reciever")
     amount = models.IntegerField()
     timestamp = models.DateTimeField(auto_now_add=True)
     signature = models.TextField()
@@ -52,10 +53,6 @@ class Transaction(models.Model):
         hashEncoded = json.dumps(self.get_data(), sort_keys=True).encode()
         return hashlib.sha256(hashEncoded).hexdigest()
     
-    def makeTransaction(self):
-        self.sender.send_amount(self.amount)
-        self.reciever.recieve_amount(self.amount)
-
     def save(self,*args, **kwargs) -> None:
         self.signature = self.signTransaction()
         self.hash = self.get_hash()
@@ -66,7 +63,6 @@ class Transaction(models.Model):
 
     def get_hash(self):
         return hashlib.sha256(json.dumps(self.get_transaction_data()).encode()).hexdigest()
-
 
     def get_data(self):
         return {
@@ -85,9 +81,8 @@ class Transaction(models.Model):
         data = self.get_data()
         data.update({
             "index":self.pk,
-            "signature":self.signature,
-            "hash":self.hash
-            })
+            "signature":self.signature
+        })
         return data
 
 
@@ -95,7 +90,7 @@ class Block(models.Model):
     # serial number of block chain
     index = models.IntegerField()
     # User who mined
-    miner = models.ForeignKey(LillyUser, on_delete=models.CASCADE)
+    miner = models.ForeignKey(MintUser, on_delete=models.CASCADE)
     # Hash of previous block
     prev_hash = models.CharField(max_length = 64, verbose_name='Previous Hash')
     # Hash of the block

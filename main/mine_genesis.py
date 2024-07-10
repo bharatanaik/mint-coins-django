@@ -1,8 +1,9 @@
+from datetime import datetime
 import hashlib
 import json
 from sys import getsizeof
 from django.conf import settings
-from main.models import Block, LillyUser, Transaction
+from main.models import Block, MintUser, Transaction
 
 def block_json(request, transaction_hashes):
     transactions = []
@@ -55,9 +56,9 @@ class BlockCreator(object):
         self.nonce = nonce
         self.data = json.loads(block_json( request, transaction_hashes))
         try:
-            self.main_user = LillyUser.objects.get(username = "main")
+            self.main_user = MintUser.objects.get(username = "main")
         except: 
-            user = LillyUser(username = "main")
+            user = MintUser(username = "main")
             user.set_password("*"*6)
             user.save()
             self.main_user = user
@@ -83,15 +84,16 @@ class BlockCreator(object):
 
     def confirm_transactions(self, transactions):
         for trans in transactions:
-            trans.makeTransaction()
             trans.confirmed = True
             trans.save()
 
     def reward_miner(self):
-        self.request.user.recieve_amount(settings.MINING_REWARD)
-        Transaction.objects.create(
-            sender = self.main_user,
-            reciever = self.request.user,
-            amount = settings.MINING_REWARD,
-            confirmed = True
+        reward_transaction = Transaction(
+            sender=self.main_user,
+            reciever=self.request.user,
+            amount=settings.MINING_REWARD,
+            confirmed=True,
+            timestamp=datetime.now()
         )
+        reward_transaction.hash = reward_transaction.calculateHash()
+        reward_transaction.save()

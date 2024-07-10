@@ -17,9 +17,8 @@ urlpatterns = [
     path('mining', mining , name="mining"),
     path('blockchain', blockchain, name="blockchain"),
     path('block/<str:block_hash>', blockview, name="block"),
-    path('node', TemplateView.as_view(template_name = "main/menu/node.html"), name="node"),
+    # path('node', TemplateView.as_view(template_name = "main/menu/node.html"), name="node"),
     path('blockchain/add-block', add_block, name="add-block"),
-    path('share', TemplateView.as_view(template_name= "main/menu/share.html"), name="share")
-
+    # path('share', TemplateView.as_view(template_name= "main/menu/share.html"), name="share")
 ]+json_patterns
 

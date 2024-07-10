@@ -1,18 +1,17 @@
 from django.contrib import admin
-from main.models import Block, LillyUser, Transaction
+from main.models import Block, MintUser, Transaction
 from django.contrib.auth.admin import UserAdmin
 
-from .forms import LillyUserCreationForm, LillyUserChangeForm
+from .forms import MintUserCreationForm
 
-@admin.register(LillyUser)
-class LillyUserAdmin(UserAdmin):
-    add_form = LillyUserCreationForm
-    form = LillyUserChangeForm
-    model = LillyUser
-    list_display = ['username','address', 'amount']
+@admin.register(MintUser)
+class MintUserAdmin(UserAdmin):
+    add_form = MintUserCreationForm
+    model = MintUser
+    list_display = ['username','address']
     fieldsets = UserAdmin.fieldsets + (
-            ("Lilly Coins", {
-                'fields': ('private_key', 'public_key', 'amount')
+            ("Mint Coins", {
+                'fields': ('private_key', 'public_key')
                     }),
                 ) 
 

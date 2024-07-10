@@ -4,9 +4,9 @@ from pathlib import Path
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-SECRET_KEY = os.environ.get("SECRET_KEY")
+SECRET_KEY = "!5a^bdhn9q!nqm51ij*)zrk-rrr#$@*!%f9q!!73hpfd5xk5c1"
 
-DEBUG = False
+DEBUG = True
 
 ALLOWED_HOSTS = ['*']
 
@@ -59,12 +59,8 @@ WSGI_APPLICATION = 'core.wsgi.application'
 
 DATABASES = {
     "default": {
-        "ENGINE": "django.db.backends.postgresql",
-        'NAME':os.environ.get("NAME"),
-        'USER': os.environ.get("USER"),
-        'PASSWORD': os.environ.get("PASSWORD"),
-        'HOST': os.environ.get("HOST"),
-        'PORT': int(os.environ.get("PORT", 5432)),
+        "ENGINE": "django.db.backends.sqlite3",
+        'NAME': BASE_DIR / "db.sqlite3",
     }
 }
 
@@ -75,7 +71,7 @@ USE_TZ = True
 LOGIN_REDIRECT_URL = "account"
 LOGOUT_REDIRECT_URL = "/"
 
-AUTH_USER_MODEL = 'main.LillyUser'
+AUTH_USER_MODEL = 'main.MintUser'
 
 STATIC_URL = 'static/'
 STATIC_ROOT = BASE_DIR / 'staticfiles'

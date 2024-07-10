@@ -23,7 +23,7 @@
                 <form method="post">
                     {% csrf_token %}
                     <div class="mb-3">
-                        <label for="id_reciever" class="form-label">LC address</label>
+                        <label for="id_reciever" class="form-label">MC address</label>
                         {% if recv_address %}
                         <input type="text" class="form-control" name="address" id="id_address"
                             value="{{ recv_address }}" aria-describedby="addressHelp" readonly>
@@ -31,7 +31,7 @@
                         <input type="text" class="form-control" name="address" id="id_address"
                             aria-describedby="addressHelp" required>
                         {% endif %}
-                        <div class="form-text" id="addressHelp">128-bit LC address of reciever for anonymous
+                        <div class="form-text" id="addressHelp">128-bit MC address of reciever for anonymous
                             transaction</div>
                     </div>
                     <div class="mb-3">

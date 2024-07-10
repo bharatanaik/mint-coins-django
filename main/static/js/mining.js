@@ -33,4 +33,4 @@ function delayLoop(iterations, delay) {
     }
     loop();
 }
-delayLoop(json_data["nonce"], 1);
+delayLoop(json_data["nonce"], 0);
