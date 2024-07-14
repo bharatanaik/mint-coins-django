@@ -1,0 +1,33 @@
+{% extends 'base.html' %}
+{% block content %}
+
+<div class="container">
+    <div class="row">
+        <div class="col-md-3"></div>
+        <div class="col-md-6">
+            {% if messages %}
+            {% for message in messages %}
+            <div class="alert alert-warning m-2">
+                <p>{{ message }}</p>
+            </div>
+            {% endfor %}
+            
+            {% endif %}
+            <div class="card shadow">
+                <div class="card-body">
+                    <form method="post">
+                        {% csrf_token %}
+                        <h2>Please enter your OTP</h2>
+                        <div class="mb-3">
+                            <label for="id_otp" class="form-label">OTP: </label>
+                            <input type="number" class="form-control" name="otp">
+                        </div>
+                        <button type="submit" class="btn btn-dark">Verify</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock content %}

@@ -1,4 +1,5 @@
-from django.http import  JsonResponse
+import random
+from django.http import  HttpRequest, JsonResponse
 from django.urls import reverse
 from main.mine import MineBlock
 from django.conf import settings
@@ -107,16 +108,39 @@ def blockview(request, block_hash):
     }
     return render(request, "main/menu/block.html", context)
 
-
 class RegisterView(FormView):
     template_name = "registration/signup.html"
     form_class = MintUserCreationForm
-    success_url = reverse_lazy("account")
+    success_url = reverse_lazy("confirm-otp")
 
     def form_valid(self, form:MintUserCreationForm):
-        user = form.save()
-        login(self.request, user)
+        user:MintUser = form.save()
+        user.is_active = False
+        user.otp = random.randint(100000, 999999)
+        user.save()
+        user.email_user("Confirmation OTP", f"Your otp is {user.otp}", "localhost")
+        self.success_url = reverse("confirm-otp", kwargs= { "user_id":user.id}) 
         return super().form_valid(form)
+    
+    @staticmethod
+    def confirm_otp( request:HttpRequest, user_id):
+        if request.method == "POST":
+            otp = int(request.POST.get("otp"))
+            user = MintUser.objects.get(id = user_id)
+            if user:
+                print(type(otp), type(user.otp))
+                print(user.otp == otp)
+                if otp == user.otp:
+                    user.is_active = True
+                    user.save()
+                    login(request, user)
+                    return redirect(reverse("account"))
+                else:
+                    messages.info(request, "Please enter correct otp")
+            else:
+                messages.info(request, "User does not exist")
+
+        return render(request, "registration/otp.html")
     
 # JSON RESPONSE FUNCTIONS
 
@@ -149,4 +173,3 @@ def get_blockchain(request):
         json_data["blockchain"].append(block_dict)
 
     return JsonResponse(json_data)
-

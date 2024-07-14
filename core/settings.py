@@ -10,6 +10,11 @@ DEBUG = True
 
 ALLOWED_HOSTS = ['*']
 
+
+CSRF_TRUSTED_ORIGINS = [
+    "https://extremely-rested-fowl.ngrok-free.app"
+]
+
 # SET difficulty - difficulty defines how many zeroes should it contain in prefix
 MINING_DIFFICULTY = 3
 # How much reward should be given for mining
@@ -63,6 +68,11 @@ DATABASES = {
         'NAME': BASE_DIR / "db.sqlite3",
     }
 }
+
+EMAIL_HOST = 'sandbox.smtp.mailtrap.io'
+EMAIL_HOST_USER = 'eda39de48a8c73'
+EMAIL_HOST_PASSWORD = '0d8c6f6436e263'
+EMAIL_PORT = '2525'
 
 LANGUAGE_CODE = 'en-us'
 TIME_ZONE = 'Asia/Kolkata'

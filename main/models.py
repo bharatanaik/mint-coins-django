@@ -12,7 +12,7 @@ class MintUser(AbstractUser):
     public_key = models.TextField(unique=True)
     private_key = models.TextField(unique=True)
     address = models.CharField(max_length=32, unique=True)
-
+    otp = models.IntegerField(default = 7777)
 
     def get_balance(self):
         total_received = Transaction.objects.filter(reciever=self, confirmed=True).aggregate(total=Sum('amount'))['total'] or 0
@@ -35,7 +35,7 @@ class MintUser(AbstractUser):
             self.address = hashlib.md5(self.private_key.encode()).hexdigest()
         return super().save(*args, **kwargs)
 
-    
+
 class Transaction(models.Model):
     sender = models.ForeignKey(MintUser, on_delete=models.CASCADE, related_name="sender")
     reciever =  models.ForeignKey(MintUser, on_delete=models.CASCADE, related_name="reciever")
@@ -110,5 +110,3 @@ class Block(models.Model):
     block_reward = models.FloatField(default=settings.MINING_REWARD)
     # Block Size
     block_size = models.IntegerField()
-
-        

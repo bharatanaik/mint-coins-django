@@ -9,6 +9,7 @@ json_patterns = [
 ]
 
 urlpatterns = [
+    path('accounts/otp/<int:user_id>', RegisterView.confirm_otp, name='confirm-otp'),
 
     path('', IndexView.as_view(), name="index"),
     path('signup', RegisterView.as_view(), name="signup"),

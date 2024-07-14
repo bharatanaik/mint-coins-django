@@ -20,3 +20,11 @@ class MineBlock:
             nonce+=1
         return hash, nonce
 
+
+
+if __name__ == "__main__":
+    json_data = open("mine.json", "r").read()
+    mining = MineBlock(json_data)
+    mining.difficulty = 5
+    print(mining.get_block_hash())
+
